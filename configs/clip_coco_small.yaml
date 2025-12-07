@@ -1,0 +1,52 @@
+# CLIP Model Configuration for Small COCO Subset
+
+# Dataset paths
+data:
+  train:
+    annotation_file: "images/annotations_trainval2017/annotations/captions_train2017.json"
+    image_dir: "images/train2017.1/train2017"
+    subset_percentage: 0.1  # Use 10% of training data
+  val:
+    annotation_file: "images/annotations_trainval2017/annotations/captions_val2017.json"
+    image_dir: "images/val2017"
+    subset_percentage: 0.2  # Use 20% of validation data
+
+# Model architecture
+model:
+  vision:
+    backbone: "resnet50"  # or "vit"
+    embed_dim: 512
+    projection_dim: 256
+  text:
+    vocab_size: 10000
+    embed_dim: 512
+    num_layers: 4
+    num_heads: 8
+    max_seq_length: 77
+    projection_dim: 256
+
+# Training
+training:
+  batch_size: 32
+  num_epochs: 10
+  learning_rate: 1e-4
+  weight_decay: 0.01
+  warmup_steps: 1000
+  gradient_clip_norm: 1.0
+  use_amp: true
+  
+  # Checkpointing
+  save_dir: "checkpoints"
+  save_every: 2  # Save every N epochs
+  resume_from: null  # Path to checkpoint to resume from
+
+# Evaluation
+eval:
+  batch_size: 64
+  top_k: [1, 5, 10]  # Recall@K values
+
+# Logging
+logging:
+  log_dir: "logs"
+  log_every: 100  # Log every N steps
+
