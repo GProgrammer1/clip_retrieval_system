@@ -1,0 +1,52 @@
+# CLIP Model Configuration for Medium COCO Subset
+
+# Dataset paths
+data:
+  train:
+    annotation_file: "images/annotations_trainval2017/annotations/captions_train2017.json"
+    image_dir: "images/train2017.1/train2017"
+    subset_percentage: 0.5  # Use 50% of training data
+  val:
+    annotation_file: "images/annotations_trainval2017/annotations/captions_val2017.json"
+    image_dir: "images/val2017"
+    subset_percentage: 1.0  # Use full validation set
+
+# Model architecture
+model:
+  vision:
+    backbone: "resnet50"
+    embed_dim: 512
+    projection_dim: 256
+  text:
+    vocab_size: 10000
+    embed_dim: 512
+    num_layers: 4
+    num_heads: 8
+    max_seq_length: 77
+    projection_dim: 256
+
+# Training
+training:
+  batch_size: 64
+  num_epochs: 20
+  learning_rate: 5e-5
+  weight_decay: 0.01
+  warmup_steps: 2000
+  gradient_clip_norm: 1.0
+  use_amp: true
+  
+  # Checkpointing
+  save_dir: "checkpoints"
+  save_every: 5
+  resume_from: null
+
+# Evaluation
+eval:
+  batch_size: 128
+  top_k: [1, 5, 10]
+
+# Logging
+logging:
+  log_dir: "logs"
+  log_every: 200
+
