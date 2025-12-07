@@ -53,24 +53,24 @@ pip install -r requirements.txt
 
 ### Quick Start in Colab
 
-**📖 Start here:** Open `notebooks/00_GETTING_STARTED.ipynb` first! It has the complete guide.
+**Start here:** Open `notebooks/00_GETTING_STARTED.ipynb` first! It has the complete guide.
 
 **Minimal Pipeline (4 notebooks):**
-1. **`05_train_script.ipynb`** ⭐ - Train the model
-2. **`06_eval_script.ipynb`** ⭐ - Evaluate performance
-3. **`07_export_embeddings.ipynb`** ⭐ - Precompute embeddings
-4. **`08_retrieve_script.ipynb`** ⭐ - Use the model for search
+1. **`05_train_script.ipynb`** - Train the model
+2. **`06_eval_script.ipynb`** - Evaluate performance
+3. **`07_export_embeddings.ipynb`** - Precompute embeddings
+4. **`08_retrieve_script.ipynb`** - Use the model for search
 
 **All Notebooks:**
-- **`00_GETTING_STARTED.ipynb`** 📖 - **READ THIS FIRST!** Complete setup guide
+- **`00_GETTING_STARTED.ipynb`** - **READ THIS FIRST!** Complete setup guide
 - **`01_dataset_exploration.ipynb`** - Explore dataset (optional)
 - **`02_training.ipynb`** - Interactive training (alternative to 05)
 - **`03_evaluation.ipynb`** - Interactive evaluation (alternative to 06)
 - **`04_inference_retrieval.ipynb`** - Interactive retrieval (alternative to 08)
-- **`05_train_script.ipynb`** ⭐ - Train model (use this!)
-- **`06_eval_script.ipynb`** ⭐ - Evaluate model (use this!)
-- **`07_export_embeddings.ipynb`** ⭐ - Export embeddings (use this!)
-- **`08_retrieve_script.ipynb`** ⭐ - Retrieval script (use this!)
+- **`05_train_script.ipynb`** - Train model (use this!)
+- **`06_eval_script.ipynb`** - Evaluate model (use this!)
+- **`07_export_embeddings.ipynb`** - Export embeddings (use this!)
+- **`08_retrieve_script.ipynb`** - Retrieval script (use this!)
 
 **Important:** You don't run Python files directly! The `src/` directory contains code that notebooks import. Just run the notebooks.
 

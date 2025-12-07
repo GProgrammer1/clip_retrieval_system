@@ -50,7 +50,7 @@ def test_dataset_loader():
     print(f"Encoded: {encoded}")
     print(f"Decoded: {tokenizer.decode(encoded)}")
 
-    print("\n✅ Dataset loader test passed!")
+    print("\nDataset loader test passed!")
 
 
 if __name__ == "__main__":

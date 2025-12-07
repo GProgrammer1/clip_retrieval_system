@@ -5,7 +5,6 @@ from pathlib import Path
 
 import torch
 
-# Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.models.clip_model import CLIPModel
@@ -15,7 +14,6 @@ def test_model_forward():
     """Test that model forward pass works correctly."""
     print("Testing CLIP model forward pass...")
 
-    # Model config
     vision_config = {
         "backbone": "resnet50",
         "embed_dim": 512,
@@ -31,11 +29,9 @@ def test_model_forward():
         "projection_dim": 256,
     }
 
-    # Create model
     model = CLIPModel(vision_config=vision_config, text_config=text_config)
     model.eval()
 
-    # Dummy inputs
     batch_size = 4
     images = torch.randn(batch_size, 3, 224, 224)
     text_tokens = torch.randint(0, 1000, (batch_size, 20))
@@ -67,7 +63,7 @@ def test_model_forward():
     print(f"  Image encoder: {img_emb.shape}")
     print(f"  Text encoder: {txt_emb.shape}")
 
-    print("\n✅ Model forward pass test passed!")
+    print("\nModel forward pass test passed!")
 
 
 if __name__ == "__main__":
