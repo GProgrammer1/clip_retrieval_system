@@ -17,13 +17,11 @@ def collate_fn(batch, tokenizer, max_seq_length):
     images = torch.stack([item["image"] for item in batch])
     captions = [item["caption"] for item in batch]
 
-    # Tokenize captions
     token_ids = [
         tokenizer.encode(cap, max_length=max_seq_length) for cap in captions
     ]
     token_tensor = torch.tensor(token_ids)
 
-    # Create mask (True for padding)
     mask = token_tensor == tokenizer.get_pad_token_id()
 
     return {
@@ -44,26 +42,21 @@ def main():
     )
     args = parser.parse_args()
 
-    # Load config
     with open(args.config, "r") as f:
         config = yaml.safe_load(f)
 
-    # Setup device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # Create directories
     base_dir = Path(args.config).parent.parent
     checkpoint_dir = base_dir / config["training"]["save_dir"]
     checkpoint_dir.mkdir(exist_ok=True, parents=True)
 
-    # Build tokenizer
     print("Building tokenizer vocabulary...")
     tokenizer = SimpleTokenizer(
         vocab_size=config["model"]["text"]["vocab_size"], min_freq=2
     )
 
-    # Load subset to build vocab
     temp_loader = build_coco_dataloader(
         annotation_file=str(base_dir / config["data"]["train"]["annotation_file"]),
         image_dir=str(base_dir / config["data"]["train"]["image_dir"]),
@@ -80,7 +73,6 @@ def main():
     tokenizer.build_vocab(all_captions)
     print(f"Vocabulary size: {len(tokenizer)}")
 
-    # Create data loaders
     from torch.utils.data import DataLoader
 
     train_dataset = build_coco_dataloader(
@@ -105,13 +97,11 @@ def main():
 
     print(f"Train batches: {len(train_loader)}")
 
-    # Create model
     model = CLIPModel(
         vision_config=config["model"]["vision"],
         text_config=config["model"]["text"],
     ).to(device)
 
-    # Setup optimizer and scheduler
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config["training"]["learning_rate"],
@@ -129,7 +119,6 @@ def main():
         torch.cuda.amp.GradScaler() if config["training"]["use_amp"] else None
     )
 
-    # Resume from checkpoint if provided
     start_epoch = 0
     best_loss = float("inf")
     if args.resume:
@@ -141,7 +130,6 @@ def main():
         best_loss = checkpoint["loss"]
         print(f"Resumed from epoch {start_epoch}")
 
-    # Training loop
     for epoch in range(start_epoch, config["training"]["num_epochs"]):
         print(f"\nEpoch {epoch + 1}/{config['training']['num_epochs']}")
 
