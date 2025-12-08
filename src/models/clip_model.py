@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .text_encoder import TextEncoder
-from .vision_encoder import VisionEncoder
+from .vision_encoder import VisionEncoder, ViTVisionEncoder
 
 
 class CLIPModel(nn.Module):
@@ -34,6 +34,11 @@ class CLIPModel(nn.Module):
         backbone = vision_config.get("backbone", "resnet50")
         if backbone == "resnet50":
             self.vision_encoder = VisionEncoder(
+                embed_dim=vision_config.get("embed_dim", 512),
+                projection_dim=vision_config.get("projection_dim", 256),
+            )
+        elif backbone == "vit" or backbone == "vit_b_16":
+            self.vision_encoder = ViTVisionEncoder(
                 embed_dim=vision_config.get("embed_dim", 512),
                 projection_dim=vision_config.get("projection_dim", 256),
             )
