@@ -25,7 +25,7 @@ class VisionEncoder(nn.Module):
         
         # Projection head
         self.projection = nn.Sequential(
-            nn.Linear(2048, embed_dim),  # ResNet-50 outputs 2048-dim features
+            nn.Linear(2048, embed_dim),  
             nn.ReLU(),
             nn.Linear(embed_dim, projection_dim),
         )
@@ -41,11 +41,11 @@ class VisionEncoder(nn.Module):
             Projected embeddings [batch_size, projection_dim]
         """
         # Extract features
-        features = self.backbone(x)  # [batch_size, 2048, 1, 1]
-        features = features.view(features.size(0), -1)  # [batch_size, 2048]
+        features = self.backbone(x)  
+        features = features.view(features.size(0), -1)  
         
         # Project to embedding space
-        embeddings = self.projection(features)  # [batch_size, projection_dim]
+        embeddings = self.projection(features)  
         
         # L2 normalize
         embeddings = nn.functional.normalize(embeddings, p=2, dim=1)
@@ -66,14 +66,14 @@ class ViTVisionEncoder(nn.Module):
         """
         super().__init__()
         # Load pretrained ViT
-        vit = models.vit_b_16(weights=models.ViT_B_16_Weights.IMAGENET1K_V1)
+        self.vit = models.vit_b_16(weights=models.ViT_B_16_Weights.IMAGENET1K_V1)
         
         # Use the encoder part
-        self.backbone = vit.encoder
+        self.backbone = self.vit.encoder
         
         # Projection head
         self.projection = nn.Sequential(
-            nn.Linear(768, embed_dim),  # ViT-B/16 outputs 768-dim features
+            nn.Linear(768, embed_dim),  
             nn.ReLU(),
             nn.Linear(embed_dim, projection_dim),
         )
@@ -88,15 +88,13 @@ class ViTVisionEncoder(nn.Module):
         Returns:
             Projected embeddings [batch_size, projection_dim]
         """
-        # ViT expects different preprocessing, but we'll use standard transforms
-        # Extract CLS token embedding
-        x = vit.process_input(x) if hasattr(vit, 'process_input') else x
-        features = self.backbone(x)
-        # Get CLS token (first token)
-        cls_token = features[:, 0]  # [batch_size, 768]
+        # Use ViT's forward method to get CLS token
+        vit_output = self.vit(x)
+        # ViT returns [batch_size, 768] for CLS token
+        cls_token = vit_output
         
         # Project to embedding space
-        embeddings = self.projection(cls_token)  # [batch_size, projection_dim]
+        embeddings = self.projection(cls_token)  
         
         # L2 normalize
         embeddings = nn.functional.normalize(embeddings, p=2, dim=1)
