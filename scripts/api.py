@@ -48,6 +48,7 @@ def load_model(checkpoint_path: str, config_path: str):
     tokenizer = SimpleTokenizer(
         vocab_size=config["model"]["text"]["vocab_size"], min_freq=2
     )
+    # Note: Vocabulary will be built from metadata when embeddings are loaded
 
     # Image transform
     image_transform = transforms.Compose(
@@ -65,7 +66,7 @@ def load_model(checkpoint_path: str, config_path: str):
 
 def load_embeddings(embeddings_dir: str):
     """Load precomputed embeddings."""
-    global image_embeddings, metadata
+    global image_embeddings, metadata, tokenizer
 
     embeddings_path = Path(embeddings_dir)
     if not embeddings_path.exists():
@@ -78,6 +79,14 @@ def load_embeddings(embeddings_dir: str):
 
     with open(embeddings_path / "metadata.json", "r") as f:
         metadata = json.load(f)
+
+    # Build tokenizer vocabulary from metadata captions
+    if tokenizer is not None and hasattr(tokenizer, 'build_vocab'):
+        if 'captions' in metadata:
+            tokenizer.build_vocab(metadata['captions'])
+            print(f"Built tokenizer vocabulary from {len(metadata['captions'])} captions")
+        else:
+            print("Warning: No captions in metadata to build vocabulary")
 
     print(f"Loaded {len(metadata['image_ids'])} precomputed embeddings")
 
@@ -131,7 +140,7 @@ async def text_to_image(query: str, top_k: int = 5):
 
     # Encode query
     token_ids = tokenizer.encode(
-        query, max_length=77  # Default max_seq_length
+        query, max_length=77  
     )
     token_tensor = torch.tensor([token_ids]).to(device)
     mask = token_tensor == tokenizer.get_pad_token_id()
@@ -183,7 +192,7 @@ async def image_to_text(file: UploadFile = File(...), top_k: int = 5):
         image_embedding = model.encode_image(img_tensor).cpu().numpy()
 
     # If we have precomputed text embeddings, use them
-    # Otherwise, encode captions on the fly (slower)
+    # Otherwise, encode captions on the fly 
     if image_embeddings is not None and metadata is not None:
         # Use image-to-image similarity as proxy
         similarities = np.dot(image_embedding, image_embeddings.T).squeeze()
@@ -266,13 +275,10 @@ def main():
     parser.add_argument("--host", type=str, default="0.0.0.0")
     args = parser.parse_args()
 
-    # Load model
     load_model(args.checkpoint, args.config)
 
-    # Load embeddings if available
     load_embeddings(args.embeddings_dir)
 
-    # Import uvicorn here to avoid requiring it if not using API
     import uvicorn
 
     uvicorn.run(app, host=args.host, port=args.port)
